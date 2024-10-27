@@ -1,5 +1,7 @@
 package com.example.dailywellnesstracker.Model;
 
+import android.app.Application;
+
 import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
@@ -20,11 +22,13 @@ public interface WellnessEntryDao {
     @Delete
     void delete(WellnessEntry entry);
 
-    @Query("SELECT * FROM wellness_entries WHERE date BETWEEN :startDate AND :endDate")
-    LiveData<List<WellnessEntry>> getEntriesByDateRange(long startDate, long endDate);
-
     @Query("SELECT * FROM wellness_entries")
     LiveData<List<WellnessEntry>> getAllEntries();
 
+    @Query("SELECT * FROM wellness_entries WHERE userId = :userId")
+    LiveData<List<WellnessEntry>> getEntriesForUser(int userId);
+
+    @Query("DELETE FROM wellness_entries WHERE userId = :userId")
+    void deleteTasksByUserId(int userId);
 
 }

@@ -8,6 +8,7 @@
     android:padding="16dp"
     tools:context=".View.MainActivity">
 
+
     <EditText
         android:id="@+id/editTextWaterIntake"
         android:layout_width="0dp"

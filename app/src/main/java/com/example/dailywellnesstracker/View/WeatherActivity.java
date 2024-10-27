@@ -53,6 +53,11 @@ public class WeatherActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_weather);
 
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+
         editTextCity = findViewById(R.id.editTextCity);
         textViewWeather = findViewById(R.id.textViewWeather);
         buttonFetchWeather = findViewById(R.id.buttonFetchWeather);
@@ -95,5 +100,10 @@ public class WeatherActivity extends AppCompatActivity {
                     Toast.makeText(WeatherActivity.this, "Request failed: " + t.getMessage(), Toast.LENGTH_SHORT).show();
                 }
             });
+    }
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
     }
 }

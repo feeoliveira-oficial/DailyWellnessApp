@@ -10,9 +10,18 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
+import com.example.dailywellnesstracker.Model.User;
+import com.example.dailywellnesstracker.Model.WellnessEntry;
 import com.example.dailywellnesstracker.R;
+import com.example.dailywellnesstracker.ViewModel.MainActivityViewModel;
+import com.example.dailywellnesstracker.ViewModel.UserViewModel;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class RegisterActivity extends AppCompatActivity {
@@ -20,6 +29,8 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText editTextName, editTextAge, editTextHeight, editTextWeight;
     private Spinner spinnerGender;
     private Button buttonRegister;
+    private UserViewModel userViewModel;
+    private ArrayAdapter<CharSequence> adapter;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -55,10 +66,29 @@ public class RegisterActivity extends AppCompatActivity {
         spinnerGender = findViewById(R.id.spinnerGender);
         buttonRegister = findViewById(R.id.buttonRegister);
 
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+        RecyclerView recyclerViewEntries = findViewById(R.id.recyclerViewEntries);
+        recyclerViewEntries.setLayoutManager(new LinearLayoutManager(this));
+
+        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
+        int userId = getIntent().getIntExtra("userId", -1);
+
+        adapter = ArrayAdapter.createFromResource(
                 this, R.array.gender_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerGender.setAdapter(adapter);
+
+        if (userId != -1) {
+            userViewModel.getUserById(userId).observe(this, user -> {
+                if (user != null) {
+                    editTextName.setText(user.getUsername());
+                    editTextAge.setText(user.getAge());
+                    editTextHeight.setText(user.getHeight());
+                    editTextWeight.setText(user.getWeight());
+                    spinnerGender.setSelection(adapter.getPosition(user.getGender()));
+                }
+            });
+
+        }
 
         buttonRegister.setOnClickListener(v -> {
             String name = editTextName.getText().toString();
@@ -70,11 +100,22 @@ public class RegisterActivity extends AppCompatActivity {
             if (name.isEmpty() || age.isEmpty() || height.isEmpty() || weight.isEmpty()) {
                 Toast.makeText(this, "Please fill out all fields", Toast.LENGTH_SHORT).show();
             } else {
+                User newUser = new User(name, age, height, weight, gender);
+                userViewModel.insertUser(newUser);
+
                 Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
             }
         });
 
+        Button buttonUsers = findViewById(R.id.buttonUsers);
+        buttonUsers.setOnClickListener(v -> {
+            Intent intent = new Intent(RegisterActivity.this, UserListActivity.class);
+            startActivity(intent);
+        });
+
+
     }
+
 }

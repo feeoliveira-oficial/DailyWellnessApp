@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">dailywellnesstracker</string>
+    <string name="app_name">Daily Wellness Tracker</string>
     <string-array name="exercise_options">
         <item>Running</item>
         <item>Walking</item>

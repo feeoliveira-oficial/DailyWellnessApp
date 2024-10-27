@@ -12,6 +12,7 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
@@ -26,14 +27,8 @@ import java.util.List;
 public class WellnessAdapter  extends RecyclerView.Adapter<WellnessAdapter.WellnessViewHolder> {
 
     private List<WellnessEntry> wellnessList;
-    private MainActivity mainActivity;
+    private AppCompatActivity activity;
     private MainActivityViewModel viewModel;
-
-    public WellnessAdapter(MainActivity mainActivity, List<WellnessEntry> wellnessList) {
-        this.wellnessList = wellnessList;
-        this.mainActivity = mainActivity;
-        this.viewModel = new ViewModelProvider(mainActivity).get(MainActivityViewModel.class);
-    }
 
     public static class WellnessViewHolder extends RecyclerView.ViewHolder {
         public TextView textViewWaterIntake, textViewSleepHours, textViewExercise, textViewDate;
@@ -49,8 +44,6 @@ public class WellnessAdapter  extends RecyclerView.Adapter<WellnessAdapter.Welln
             switchEntryStatus = itemView.findViewById(R.id.switchEntryStatus);
         }
     }
-
-
     @NonNull
     @Override
     public WellnessViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -96,7 +89,6 @@ public class WellnessAdapter  extends RecyclerView.Adapter<WellnessAdapter.Welln
                 viewModel.update(entry);
             }
 
-            mainActivity.updateProgressBar();
         });
 
         holder.itemView.setOnClickListener(v -> {
@@ -113,34 +105,12 @@ public class WellnessAdapter  extends RecyclerView.Adapter<WellnessAdapter.Welln
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             editExercise.setAdapter(adapter);
 
-            Button buttonSave = dialogView.findViewById(R.id.buttonSave);
-            Button buttonCancel = dialogView.findViewById(R.id.buttonCancel);
-            Button buttonDelete = dialogView.findViewById(R.id.buttonDelete);
-
             editWaterIntake.setText(entry.getWaterIntake());
             editSleepHours.setText(entry.getSleepHours());
 
             AlertDialog dialog = builder.create();
             dialog.show();
 
-            buttonSave.setOnClickListener(view -> {
-                entry.setWaterIntake(editWaterIntake.getText().toString());
-                entry.setSleepHours(editSleepHours.getText().toString());
-                entry.setExercise(editExercise.getSelectedItem().toString());
-
-                viewModel.update(entry);
-                notifyItemChanged(position);
-                dialog.dismiss();
-            });
-
-            buttonCancel.setOnClickListener(view -> dialog.dismiss());
-
-            buttonDelete.setOnClickListener(view -> {
-                viewModel.delete(entry);
-                wellnessList.remove(position);
-                notifyItemRemoved(position);
-                dialog.dismiss();
-            });
         });
 
     }

@@ -23,9 +23,6 @@ public class WellnessRepository {
         executorService.execute(() -> wellnessEntryDao.insert(entry));
     }
 
-    public LiveData<List<WellnessEntry>> getEntriesByDateRange(long startDate, long endDate) {
-        return wellnessEntryDao.getEntriesByDateRange(startDate, endDate);
-    }
 
     public LiveData<List<WellnessEntry>> getAllEntries() {
         return wellnessEntryDao.getAllEntries();
@@ -37,5 +34,9 @@ public class WellnessRepository {
 
     public void delete(WellnessEntry entry) {
         executorService.execute(() -> wellnessEntryDao.delete(entry));
+    }
+
+    public LiveData<List<WellnessEntry>> getEntriesForUser(int userId) {
+        return wellnessEntryDao.getEntriesForUser(userId);
     }
 }

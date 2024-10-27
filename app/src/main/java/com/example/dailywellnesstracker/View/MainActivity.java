@@ -17,6 +17,7 @@ import com.example.dailywellnesstracker.ViewModel.MainActivityViewModel;
 import com.google.android.material.snackbar.Snackbar;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -29,12 +30,18 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private Calendar date;
     private MainActivityViewModel viewModel;
-    private List<WellnessEntry> wellnessList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+
+        int userId = getIntent().getIntExtra("userId", -1);
 
         date = Calendar.getInstance();
         editTextWaterIntake = findViewById(R.id.editTextWaterIntake);
@@ -45,20 +52,13 @@ public class MainActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         recyclerViewEntries = findViewById(R.id.recyclerViewEntries);
 
-        wellnessList = new ArrayList<>();
-        wellnessAdapter = new WellnessAdapter(this, wellnessList);
         recyclerViewEntries.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewEntries.setAdapter(wellnessAdapter);
 
         viewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
-        viewModel.getAllEntries().observe(this, entries -> {
-            wellnessList.clear();
-            wellnessList.addAll(entries);
+        viewModel.getTasksForUser(userId).observe(this, entries -> {
             wellnessAdapter.notifyDataSetChanged();
-            updateProgressBar();
         });
-
-        progressBar.setMax(100);
 
         buttonAddEntry.setOnClickListener(view -> {
             String waterIntake = editTextWaterIntake.getText().toString().trim();
@@ -66,7 +66,8 @@ public class MainActivity extends AppCompatActivity {
             String exercise = spinnerExercise.getSelectedItem().toString();
 
             if (!waterIntake.isEmpty() && !sleepHours.isEmpty() && date != null) {
-                WellnessEntry newEntry = new WellnessEntry(waterIntake, sleepHours, exercise, date);
+                WellnessEntry newEntry = new WellnessEntry(waterIntake, sleepHours, exercise, date, userId);
+                newEntry.setUserId(userId);
                 viewModel.insert(newEntry);
                 clearFields();
                 Snackbar.make(view, "Entry added", Snackbar.LENGTH_LONG).show();
@@ -78,20 +79,6 @@ public class MainActivity extends AppCompatActivity {
         buttonSetDate.setOnClickListener(v -> showDatePickerDialog());
     }
 
-    public void updateProgressBar() {
-        int completedEntries = 0;
-        for (WellnessEntry entry : wellnessList) {
-            if (entry.isCompleted()) {
-                completedEntries++;
-            }
-        }
-        if (wellnessList.size() > 0) {
-            int progressPercentage = (int) ((completedEntries / (float) wellnessList.size()) * 100);
-            progressBar.setProgress(progressPercentage);
-        } else {
-            progressBar.setProgress(0);
-        }
-    }
 
     private void clearFields() {
         editTextWaterIntake.setText("");
@@ -112,13 +99,11 @@ public class MainActivity extends AppCompatActivity {
         datePickerDialog.show();
     }
 
-    public void refreshList() {
-        viewModel.getAllEntries().observe(this, entries -> {
-            wellnessList.clear();
-            wellnessList.addAll(entries);
-            wellnessAdapter.notifyDataSetChanged();
-            updateProgressBar();
-        });
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        finish();
+        return true;
     }
 
 }

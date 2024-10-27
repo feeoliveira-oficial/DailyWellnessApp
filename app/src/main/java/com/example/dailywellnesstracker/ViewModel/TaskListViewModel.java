@@ -7,30 +7,16 @@ import com.example.dailywellnesstracker.Model.WellnessEntry;
 import com.example.dailywellnesstracker.Repository.WellnessRepository;
 import java.util.List;
 
-public class MainActivityViewModel extends AndroidViewModel {
+public class TaskListViewModel extends AndroidViewModel {
 
     private WellnessRepository repository;
 
-    public MainActivityViewModel(Application application) {
+    public TaskListViewModel(Application application) {
         super(application);
         repository = new WellnessRepository(application);
-    }
-
-    public void insert(WellnessEntry entry) {
-        repository.insert(entry);
-    }
-
-
-    public void update(WellnessEntry entry) {
-        repository.update(entry);
-    }
-
-    public void delete(WellnessEntry entry) {
-        repository.delete(entry);
     }
 
     public LiveData<List<WellnessEntry>> getTasksForUser(int userId) {
         return repository.getEntriesForUser(userId);
     }
-
 }
