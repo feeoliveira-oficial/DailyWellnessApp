@@ -22,17 +22,21 @@ import com.example.dailywellnesstracker.ViewModel.MainActivityViewModel;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 public class WellnessAdapter  extends RecyclerView.Adapter<WellnessAdapter.WellnessViewHolder> {
 
     private List<WellnessEntry> wellnessList;
-    private AppCompatActivity activity;
     private MainActivityViewModel viewModel;
+
+    public WellnessAdapter(AppCompatActivity activity, List<WellnessEntry> wellnessList) {
+        this.wellnessList = wellnessList != null ? wellnessList : new ArrayList<>();
+        this.viewModel = new ViewModelProvider(activity).get(MainActivityViewModel.class);
+    }
 
     public static class WellnessViewHolder extends RecyclerView.ViewHolder {
         public TextView textViewWaterIntake, textViewSleepHours, textViewExercise, textViewDate;
-        public CardView cardView;
         public Switch switchEntryStatus;
         public WellnessViewHolder(View itemView) {
             super(itemView);
@@ -40,14 +44,13 @@ public class WellnessAdapter  extends RecyclerView.Adapter<WellnessAdapter.Welln
             textViewSleepHours = itemView.findViewById(R.id.textViewSleepHours);
             textViewExercise = itemView.findViewById(R.id.textViewExercise);
             textViewDate = itemView.findViewById(R.id.textViewDate);
-            cardView = itemView.findViewById(R.id.cardViewWellness);
             switchEntryStatus = itemView.findViewById(R.id.switchEntryStatus);
         }
     }
     @NonNull
     @Override
     public WellnessViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.wellness_item, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.task_item, parent, false);
         return new WellnessViewHolder(view);
     }
 
@@ -63,22 +66,9 @@ public class WellnessAdapter  extends RecyclerView.Adapter<WellnessAdapter.Welln
         if (entry.getDate() != null) {
             holder.textViewDate.setText("Date: " + sdf.format(entry.getDate().getTime()));
         }
-
         holder.switchEntryStatus.setChecked(entry.isCompleted());
-        if (entry.isCompleted()) {
-            holder.cardView.setCardBackgroundColor(Color.parseColor("#4CAF50"));
-        } else {
-            holder.cardView.setCardBackgroundColor(Color.parseColor("#FFCDD2"));
-        }
-
         holder.switchEntryStatus.setOnCheckedChangeListener((buttonView, isChecked) -> {
             entry.setCompleted(isChecked);
-
-            if (isChecked) {
-                holder.cardView.setCardBackgroundColor(Color.parseColor("#81C784"));
-            } else {
-                holder.cardView.setCardBackgroundColor(Color.parseColor("#FFCDD2"));
-            }
 
             if (isChecked) {
                 viewModel.delete(entry);
@@ -88,32 +78,14 @@ public class WellnessAdapter  extends RecyclerView.Adapter<WellnessAdapter.Welln
             } else {
                 viewModel.update(entry);
             }
-
         });
-
-        holder.itemView.setOnClickListener(v -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(holder.itemView.getContext());
-            View dialogView = LayoutInflater.from(holder.itemView.getContext()).inflate(R.layout.dialog_edit_task, null);
-            builder.setView(dialogView);
-
-            EditText editWaterIntake = dialogView.findViewById(R.id.editTextEditWaterIntake);
-            EditText editSleepHours = dialogView.findViewById(R.id.editTextEditSleepHours);
-            Spinner editExercise = dialogView.findViewById(R.id.spinnerEditExercise);
-
-            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-                    holder.itemView.getContext(), R.array.exercise_options, android.R.layout.simple_spinner_item);
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            editExercise.setAdapter(adapter);
-
-            editWaterIntake.setText(entry.getWaterIntake());
-            editSleepHours.setText(entry.getSleepHours());
-
-            AlertDialog dialog = builder.create();
-            dialog.show();
-
-        });
-
     }
+
+    private void updateCardColor(CardView cardView, boolean isCompleted) {
+        int color = isCompleted ? Color.parseColor("#81C784") : Color.parseColor("#FFCDD2");
+        cardView.setCardBackgroundColor(color);
+    }
+
 
     @Override
     public int getItemCount() {

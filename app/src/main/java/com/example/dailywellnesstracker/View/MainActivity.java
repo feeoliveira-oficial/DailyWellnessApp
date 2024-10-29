@@ -15,9 +15,9 @@ import com.example.dailywellnesstracker.Model.WellnessEntry;
 import com.example.dailywellnesstracker.R;
 import com.example.dailywellnesstracker.ViewModel.MainActivityViewModel;
 import com.google.android.material.snackbar.Snackbar;
+
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private Calendar date;
     private MainActivityViewModel viewModel;
+    private List<WellnessEntry> wellnessList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,13 +53,23 @@ public class MainActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         recyclerViewEntries = findViewById(R.id.recyclerViewEntries);
 
+        wellnessList = new ArrayList<>();
+        wellnessAdapter = new WellnessAdapter(this, wellnessList);
         recyclerViewEntries.setLayoutManager(new LinearLayoutManager(this));
         recyclerViewEntries.setAdapter(wellnessAdapter);
 
         viewModel = new ViewModelProvider(this).get(MainActivityViewModel.class);
-        viewModel.getTasksForUser(userId).observe(this, entries -> {
-            wellnessAdapter.notifyDataSetChanged();
-        });
+          if (userId != -1) {
+                viewModel.getTasksForUser(userId).observe(this, entries -> {
+                    wellnessList.clear();
+                    if (entries != null) {
+                        wellnessList.addAll(entries);
+                    }
+                    wellnessAdapter.notifyDataSetChanged();
+                });
+            } else {
+                Toast.makeText(this, "Invalid user ID", Toast.LENGTH_SHORT).show();
+            }
 
         buttonAddEntry.setOnClickListener(view -> {
             String waterIntake = editTextWaterIntake.getText().toString().trim();
@@ -66,8 +77,7 @@ public class MainActivity extends AppCompatActivity {
             String exercise = spinnerExercise.getSelectedItem().toString();
 
             if (!waterIntake.isEmpty() && !sleepHours.isEmpty() && date != null) {
-                WellnessEntry newEntry = new WellnessEntry(waterIntake, sleepHours, exercise, date, userId);
-                newEntry.setUserId(userId);
+                WellnessEntry newEntry = new WellnessEntry(userId, waterIntake, sleepHours, exercise, date);
                 viewModel.insert(newEntry);
                 clearFields();
                 Snackbar.make(view, "Entry added", Snackbar.LENGTH_LONG).show();

@@ -3,6 +3,7 @@ package com.example.dailywellnesstracker.View;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Switch;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -31,12 +32,20 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     @Override
     public void onBindViewHolder(@NonNull TaskViewHolder holder, int position) {
         WellnessEntry task = taskList.get(position);
-        holder.textViewTask.setText("Water: " + task.getWaterIntake() +
-                                    " cups, Sleep: " + task.getSleepHours() +
-                                    " hours, Exercise: " + task.getExercise());
+        holder.textViewWaterIntake.setText("Water: " + task.getWaterIntake() + " cups");
+        holder.textViewSleepHours.setText("Sleep: " + task.getSleepHours() + " hours");
+        holder.textViewExercise.setText("Exercise: " + task.getExercise());
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         holder.textViewDate.setText("Date: " + sdf.format(task.getDate().getTime()));
+
+        holder.switchEntryStatus.setChecked(task.isCompleted());
+        holder.switchEntryStatus.setText(task.isCompleted() ? "Completed" : "Not Completed");
+
+        holder.switchEntryStatus.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            task.setCompleted(isChecked);
+            holder.switchEntryStatus.setText(isChecked ? "Completed" : "Not Completed");
+        });
     }
 
     @Override
@@ -45,12 +54,16 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     }
 
     public static class TaskViewHolder extends RecyclerView.ViewHolder {
-        public TextView textViewTask, textViewDate;
+        public TextView textViewWaterIntake, textViewSleepHours, textViewExercise, textViewDate;
+        public Switch switchEntryStatus;
 
         public TaskViewHolder(@NonNull View itemView) {
             super(itemView);
-            textViewTask = itemView.findViewById(R.id.textViewTaskDetails);
+            textViewWaterIntake = itemView.findViewById(R.id.textViewWaterIntake);
+            textViewSleepHours = itemView.findViewById(R.id.textViewSleepHours);
+            textViewExercise = itemView.findViewById(R.id.textViewExercise);
             textViewDate = itemView.findViewById(R.id.textViewDate);
+            switchEntryStatus = itemView.findViewById(R.id.switchEntryStatus);
         }
     }
 }

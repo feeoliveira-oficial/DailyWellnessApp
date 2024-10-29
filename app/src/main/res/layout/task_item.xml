@@ -7,10 +7,10 @@
     android:padding="16dp">
 
     <TextView
-        android:id="@+id/textViewTaskDetails"
+        android:id="@+id/textViewWaterIntake"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Task Details"
+        android:text="Water Intake"
         android:textSize="16sp"
         android:textColor="@android:color/black"
         app:layout_constraintTop_toTopOf="parent"
@@ -18,15 +18,48 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
     <TextView
-        android:id="@+id/textViewTaskDate"
+        android:id="@+id/textViewSleepHours"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Sleep Hours"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        app:layout_constraintTop_toBottomOf="@id/textViewWaterIntake"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp" />
+
+    <TextView
+        android:id="@+id/textViewExercise"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Exercise"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        app:layout_constraintTop_toBottomOf="@id/textViewSleepHours"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp" />
+
+    <TextView
+        android:id="@+id/textViewDate"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Date"
         android:textSize="14sp"
         android:textColor="@android:color/darker_gray"
-        app:layout_constraintTop_toBottomOf="@id/textViewTaskDetails"
+        app:layout_constraintTop_toBottomOf="@id/textViewExercise"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="4dp" />
+        android:layout_marginTop="8dp" />
+
+    <Switch
+        android:id="@+id/switchEntryStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Completed"
+        app:layout_constraintTop_toBottomOf="@id/textViewDate"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="8dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

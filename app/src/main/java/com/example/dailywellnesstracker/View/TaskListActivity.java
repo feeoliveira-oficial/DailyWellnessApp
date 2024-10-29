@@ -2,7 +2,6 @@ package com.example.dailywellnesstracker.View;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -20,6 +19,39 @@ public class TaskListActivity extends AppCompatActivity {
     private RecyclerView recyclerViewTasks;
     private TaskAdapter taskAdapter;
     private TaskListViewModel taskListViewModel;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_task_list);
+
+        recyclerViewTasks = findViewById(R.id.recyclerViewTasks);
+        recyclerViewTasks.setLayoutManager(new LinearLayoutManager(this));
+        taskAdapter = new TaskAdapter();
+        recyclerViewTasks.setAdapter(taskAdapter);
+
+        taskListViewModel = new ViewModelProvider(this).get(TaskListViewModel.class);
+
+        int userId = getIntent().getIntExtra("userId", -1);
+
+        if (userId != -1)
+        {
+            taskListViewModel.getTasksForUser(userId).observe(this, tasks -> {
+                if (tasks != null && !tasks.isEmpty())
+                {
+                    taskAdapter.setTasks(tasks);
+                }
+                else
+                {
+                    Toast.makeText(this, "No tasks found for this user", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+        else
+        {
+            Toast.makeText(this, "Invalid user ID", Toast.LENGTH_SHORT).show();
+        }
+    }
 
 
     @Override
@@ -42,40 +74,5 @@ public class TaskListActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_task_list);
-
-        recyclerViewTasks = findViewById(R.id.recyclerViewTasks);
-        recyclerViewTasks.setLayoutManager(new LinearLayoutManager(this));
-        taskAdapter = new TaskAdapter();
-        recyclerViewTasks.setAdapter(taskAdapter);
-        taskListViewModel = new ViewModelProvider(this).get(TaskListViewModel.class);
-
-        int userId = getIntent().getIntExtra("userId", -1);
-        Intent intent = new Intent(this, TaskListActivity.class);
-        intent.putExtra("userId", userId);
-        startActivity(intent);
-
-        if (userId != -1)
-        {
-            taskListViewModel.getTasksForUser(userId).observe(this, tasks -> {
-                if (tasks != null && !tasks.isEmpty())
-                {
-                    taskAdapter.setTasks(tasks);
-                }
-                else
-                {
-                    Toast.makeText(this, "No tasks found for this user", Toast.LENGTH_SHORT).show();
-                }
-            });
-        }
-        else
-        {
-            Toast.makeText(this, "Invalid user ID", Toast.LENGTH_SHORT).show();
-        }
     }
 }

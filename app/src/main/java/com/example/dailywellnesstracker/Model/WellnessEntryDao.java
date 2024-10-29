@@ -22,13 +22,16 @@ public interface WellnessEntryDao {
     @Delete
     void delete(WellnessEntry entry);
 
-    @Query("SELECT * FROM wellness_entries")
+    @Query("SELECT * FROM wellness_entries ORDER BY date DESC")
     LiveData<List<WellnessEntry>> getAllEntries();
 
-    @Query("SELECT * FROM wellness_entries WHERE userId = :userId")
+    @Query("SELECT * FROM wellness_entries WHERE userId = :userId ORDER BY date DESC")
     LiveData<List<WellnessEntry>> getEntriesForUser(int userId);
 
     @Query("DELETE FROM wellness_entries WHERE userId = :userId")
     void deleteTasksByUserId(int userId);
+
+    @Query("SELECT * FROM wellness_entries WHERE entryId = :entryId LIMIT 1")
+    LiveData<WellnessEntry> getEntryById(int entryId);
 
 }

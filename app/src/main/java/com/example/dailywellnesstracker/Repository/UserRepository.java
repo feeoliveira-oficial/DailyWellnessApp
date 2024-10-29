@@ -37,9 +37,6 @@ public class UserRepository {
         return userDao.getUserById(userId);
     }
 
-    public void deleteUser(User user) {
-        executorService.execute(() -> userDao.delete(user));
-    }
 
     public void deleteUserAndTasks(User user) {
         executorService.execute(() -> {
